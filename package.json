@@ -1,0 +1,26 @@
+{
+  "name": "remote-hotkey-emulator",
+  "version": "1.0.0",
+  "description": "Control Windows emulator shortcuts from a phone over a trusted local network.",
+  "main": "dist/desktop/main.js",
+  "scripts": {
+    "test": "tsc -p tsconfig.json && npm run build:web && node --test dist/server/*.test.js dist/desktop/*.test.js scripts/web.test.mjs",
+    "start": "node dist/index.js",
+    "setup": "tsc -p tsconfig.json && node dist/setup.js",
+    "build": "npm run build:desktop && node scripts/build-native.mjs",
+    "build:desktop": "tsc -p tsconfig.json && npm run build:web && tsc -p tsconfig.desktop-ui.json && node scripts/build-desktop.mjs",
+    "desktop": "install-electron && npm run build:desktop && electron .",
+    "build:web": "tsc -p tsconfig.web.json && node scripts/build-web.mjs",
+    "build:native": "node scripts/build-native.mjs",
+    "test:input": "node dist/test-input.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.web.json --noEmit && tsc -p tsconfig.desktop-ui.json --noEmit"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "electron": "^45.2.1",
+    "typescript": "^7.0.2"
+  }
+}

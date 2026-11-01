@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "defaultProfileId": "pcsx2",
+  "profiles": [{
+    "id": "pcsx2",
+    "label": "PCSX2",
+    "processNames": ["pcsx2-qt.exe"],
+    "actions": {
+      "saveState": { "key": "F1", "modifiers": [] },
+      "loadState": { "key": "F3", "modifiers": [] },
+      "nextSlot": { "key": "F2", "modifiers": [] },
+      "previousSlot": { "key": "F2", "modifiers": ["Shift"] },
+      "pauseResume": { "key": "Space", "modifiers": [] },
+      "fastForward": { "key": "Tab", "modifiers": [] }
+    }
+  }]
+}

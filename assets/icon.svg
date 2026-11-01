@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Emulator Remote</title>
+  <desc>A cyan retro D-pad and two wireless arcs on a dark navy rounded square. Transparent outside the square.</desc>
+  <rect id="background" x="32" y="32" width="960" height="960" rx="216" fill="#02040D"/>
+  <g id="wireless" fill="none" stroke="#94DEFF" stroke-width="48" stroke-linecap="round">
+    <path d="M336 258 Q512 126 688 258"/>
+    <path d="M416 338 Q512 266 608 338"/>
+  </g>
+  <path id="dpad-edge" fill="#168BB8" d="M432 400 H592 Q616 400 616 424 V544 H736 Q760 544 760 568 V728 Q760 752 736 752 H616 V872 Q616 896 592 896 H432 Q408 896 408 872 V752 H288 Q264 752 264 728 V568 Q264 544 288 544 H408 V424 Q408 400 432 400Z"/>
+  <path id="dpad-face" fill="#57D4FF" d="M432 380 H592 Q616 380 616 404 V524 H736 Q760 524 760 548 V708 Q760 732 736 732 H616 V852 Q616 876 592 876 H432 Q408 876 408 852 V732 H288 Q264 732 264 708 V548 Q264 524 288 524 H408 V404 Q408 380 432 380Z"/>
+</svg>

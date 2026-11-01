@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Emulator Remote</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><img class="mark" src="../../assets/icon.png" width="32" height="32" alt=""><span>EMULATOR REMOTE</span><small>DESKTOP</small></header>
+    <h1>Stay in<br>the game.</h1>
+    <section class="panel" aria-label="Server">
+      <div class="status-line"><span class="dot" id="status-dot"></span><h2 id="status">Server stopped</h2></div>
+      <p id="input-status">Start the server to connect your phone.</p>
+      <div class="address"><span id="url">Not running</span><button id="copy" type="button" disabled>Copy</button></div>
+      <div class="row"><button class="primary" id="start" type="button" disabled>Start server</button><button id="stop" type="button" disabled>Stop server</button></div>
+    </section>
+    <section class="panel" aria-labelledby="password-title">
+      <h2 id="password-title">Remote password</h2>
+      <p id="password-status">Checking password settings…</p>
+      <form id="password-form">
+        <label for="password">Password</label>
+        <div class="password-row"><input id="password" type="password" autocomplete="off" minlength="6" maxlength="128" required placeholder="At least 6 characters"><button id="toggle-password" type="button" aria-label="Show password" aria-pressed="false" aria-controls="password">Show</button></div>
+        <button id="save-password" class="wide" type="submit">Set password</button>
+      </form>
+      <p class="hint">Set a password each time you open this app. It is kept only for this session. Changing it stops the server and signs out connected phones.</p>
+    </section>
+    <details class="panel"><summary>Network settings</summary>
+      <form id="network-form"><label for="host">PC address</label><select id="host"></select><label for="port">Port</label><input id="port" type="number" min="1" max="65535" required value="3000"><button id="save-network" class="wide" type="submit">Save network settings</button></form>
+    </details>
+    <details class="panel usage"><summary>How to use</summary>
+      <ol>
+        <li>Open this app.</li>
+        <li>Open PCSX2 and start your game.</li>
+        <li>First time: choose your PC’s Wi-Fi or Ethernet address in Network settings and set a password (open Command Prompt, type <code>ipconfig</code>, and find the <strong>IPv4 Address</strong> under your active Wi-Fi or Ethernet adapter).</li>
+        <li>Click <strong>Start server</strong>.</li>
+        <li>On your phone, connect to the same Wi-Fi, open the displayed address, and enter your password.</li>
+        <li>Keep PCSX2 focused on your PC and use the phone controls.</li>
+      </ol>
+    </details>
+    <p id="message" role="status" aria-live="polite">Loading…</p>
+    <footer>Closing this window stops the server.</footer>
+  </main>
+</body>
+</html>

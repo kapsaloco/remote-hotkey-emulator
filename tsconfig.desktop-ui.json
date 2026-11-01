@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "rootDir": "src/desktop/ui", "outDir": "dist/desktop/ui",
+    "target": "ES2022", "module": "ES2022", "lib": ["ES2022", "DOM"],
+    "types": [], "strict": true, "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true, "noEmitOnError": true
+  },
+  "include": ["src/desktop/ui/**/*.ts"]
+}

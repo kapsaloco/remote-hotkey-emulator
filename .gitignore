@@ -1,0 +1,33 @@
+node_modules/
+dist/
+coverage/
+
+# Machine-specific configuration and credentials
+config/*
+!config/profiles.example.json
+.env*
+*.local
+*.local.*
+*.log
+*.pem
+*.key
+*.pfx
+*.p12
+.npmrc
+
+# Editor, assistant, and personal workspace files
+.vscode/
+.idea/
+.vs/
+.agents/
+.codex/
+.aws/
+AGENTS.md
+NOTES.md
+notes/
+docs/*.local.*
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

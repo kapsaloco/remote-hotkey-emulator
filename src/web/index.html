@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#02040d">
+  <title>Emulator Remote</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="remote">
+    <header class="masthead"><img class="brand-mark" src="/icon.png" width="32" height="32" alt=""><span>EMULATOR REMOTE</span><span class="edition">LOCAL / 01</span></header>
+    <section class="intro" aria-labelledby="title">
+      <h1 id="title">Stay in<br>the game<span>.</span></h1>
+    </section>
+    <section class="connection" aria-label="Connection">
+      <div class="connection-heading"><span id="connection" class="connection-state" data-state="offline">Disconnected</span><button id="disconnect" class="text-button" type="button" hidden>Disconnect</button></div>
+      <form id="connect-form">
+        <label for="token">Password</label>
+        <div class="token-row"><input id="token" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="128" placeholder="Enter your remote password"><button id="connect" class="connect-button" type="submit">Connect <span aria-hidden="true">↗</span></button></div>
+        <p class="hint">Use the password you chose on your PC. Your existing access token also works until you set a password. Sign-in lasts for this page session, up to 12 hours.</p>
+      </form>
+      <div id="profile-area" hidden><label for="profile">Emulator profile</label><select id="profile" disabled></select></div>
+    </section>
+    <section class="controls" aria-label="Emulator actions">
+      <button class="action save" id="saveState" type="button" disabled><span class="action-icon" aria-hidden="true">↓</span><span class="action-copy"><span class="action-title">Save state</span><span class="action-detail" id="saveState-detail">Connect to see shortcut</span></span><span class="action-number" aria-hidden="true">01</span></button>
+      <button class="action load" id="loadState" type="button" disabled><span class="action-icon" aria-hidden="true">↶</span><span class="action-copy"><span class="action-title">Load state</span><span class="action-detail" id="loadState-detail">Connect to see shortcut</span></span><span class="action-number" aria-hidden="true">02</span></button>
+      <div class="slot-controls" role="group" aria-label="Save-state slot">
+        <button class="action slot-arrow" id="previousSlot" type="button" aria-label="Previous slot" aria-describedby="previousSlot-detail" disabled><span aria-hidden="true">←</span><span class="sr-only" id="previousSlot-detail">Connect to see shortcut</span></button>
+        <div class="slot-caption"><span>State slot</span><small>Check PCSX2</small></div>
+        <button class="action slot-arrow" id="nextSlot" type="button" aria-label="Next slot" aria-describedby="nextSlot-detail" disabled><span aria-hidden="true">→</span><span class="sr-only" id="nextSlot-detail">Connect to see shortcut</span></button>
+      </div>
+      <div class="playback-controls" role="group" aria-label="Playback controls">
+        <button class="action compact" id="pauseResume" type="button" disabled><span class="compact-icon" aria-hidden="true">⏯</span><span>Pause / Resume</span><span class="action-detail" id="pauseResume-detail">Connect to see shortcut</span></button>
+        <button class="action compact" id="fastForward" type="button" disabled><span class="compact-icon" aria-hidden="true">⏩</span><span>Fast-forward</span><span class="action-detail" id="fastForward-detail">Connect to see shortcut</span></button>
+      </div>
+    </section>
+    <p id="feedback" class="feedback" role="status" aria-live="polite">Connect to your PC to get started.</p>
+    <div id="uncertain" class="uncertain" hidden><p>Outcome unknown—check the emulator before trying again.</p><button id="acknowledge" type="button" class="connect-button">I checked the emulator</button></div>
+    <footer><p><span class="note-dot" aria-hidden="true"></span>Keep your emulator focused on the PC.</p><p>Save overwrites the active slot. Current slot is unknown; check the emulator’s on-screen indicator.</p></footer>
+    <noscript><p>Enable JavaScript to use the remote.</p></noscript>
+  </main>
+  <dialog id="load-dialog" aria-labelledby="load-title" aria-describedby="load-description">
+    <form method="dialog"><p class="eyebrow">BEFORE YOU CONTINUE</p><h2 id="load-title">Load current state?</h2><p id="load-description">Unsaved progress will be lost.</p><div class="dialog-buttons"><button value="cancel" id="cancel-load" autofocus>Cancel</button><button value="confirm" id="confirm-load">Load state</button></div></form>
+  </dialog>
+</body>
+</html>
