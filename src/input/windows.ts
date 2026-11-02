@@ -2,6 +2,12 @@ import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import path from 'node:path';
 import { InputRejected } from './adapter';
 
+export function windowsInputHelperPath(): string {
+  return process.versions.electron && !process.defaultApp
+    ? path.join(process.resourcesPath, 'native/WindowsInput.exe')
+    : path.resolve(__dirname, '../native/WindowsInput.exe');
+}
+
 export interface Shortcut {
   allowedProcesses: string[];
   key: string;
@@ -34,7 +40,8 @@ export class WindowsInput {
 
   constructor() {
     if (process.platform !== 'win32') throw new Error('Windows input requires Windows.');
-    this.child = spawn(path.resolve(__dirname, '../native/WindowsInput.exe'), [], {
+    const helper = windowsInputHelperPath();
+    this.child = spawn(helper, [], {
       shell: false, windowsHide: true, stdio: 'pipe',
     });
     this.child.stdout.setEncoding('utf8');

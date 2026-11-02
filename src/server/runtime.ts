@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { WindowsInput } from '../input/windows';
+import { WindowsInput, windowsInputHelperPath } from '../input/windows';
 import type { InputAdapter } from '../input/adapter';
 import { readJson, validateProfiles, validateServer, type PasswordHash, type ServerConfig } from './config';
 import { createRemoteServer } from './http';
@@ -26,7 +26,7 @@ class PasswordRequiredError extends Error {
 }
 function productionInput(): ReadyInput {
   if (process.platform !== 'win32') throw new Error('Production input requires Windows.');
-  if (!existsSync(path.resolve(__dirname, '../native/WindowsInput.exe')))
+  if (!existsSync(windowsInputHelperPath()))
     throw new Error('Windows input helper missing. Run npm run build.');
   return new WindowsInput();
 }
