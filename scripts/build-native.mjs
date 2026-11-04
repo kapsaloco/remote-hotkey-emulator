@@ -19,3 +19,11 @@ const result = spawnSync(compiler, [
 ], { cwd: root, shell: false, stdio: 'inherit', windowsHide: true });
 if (result.error) throw result.error;
 process.exitCode = result.status ?? 1;
+if (result.status === 0 && process.argv.includes('--test-fixture')) {
+  const fixture = spawnSync(compiler, ['/nologo', '/warnaserror+',
+    `/out:${path.join(root, 'dist', 'native', 'HelperFixture.exe')}`,
+    path.join(root, 'src-tauri', 'tests', 'fixtures', 'HelperFixture.cs')],
+    { cwd: root, shell: false, stdio: 'inherit', windowsHide: true });
+  if (fixture.error) throw fixture.error;
+  process.exitCode = fixture.status ?? 1;
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop",
+  "description": "Only the local desktop window can call the application controller.",
+  "windows": ["main"],
+  "permissions": [
+    "allow-remote-state", "allow-remote-start", "allow-remote-stop",
+    "allow-remote-password", "allow-remote-network", "allow-remote-copy-url"
+  ]
+}

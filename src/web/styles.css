@@ -95,6 +95,12 @@ input::placeholder { color: #98accb; }
 .action-number { font-size: 10px; align-self: flex-start; margin-left: auto; color: #9fbae2; padding-top: 4px; }
 .feedback { font-size: 12px; line-height: 1.6; min-height: 39px; margin: 18px 2px 14px; color: #c5deff; }
 .uncertain { border: 1px solid #b58979; border-radius: 4px; padding: 14px; margin-bottom: 20px; color: #ffd0bf; background: #211b2a; font-size: 13px; line-height: 1.5; }
+.settings { border: 1px solid var(--line); border-radius: 4px; padding: 0 14px; margin-bottom: 20px; background: #080f25d9; }
+.settings summary { padding: 14px 0; cursor: pointer; font-size: 13px; color: #c5deff; }
+.settings summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.setting-option { display: flex; align-items: center; gap: 12px; min-height: 44px; margin: 0; font-size: 13px; color: #e6efff; cursor: pointer; }
+.setting-option input { flex: 0 0 20px; width: 20px; height: 20px; min-height: 0; padding: 0; margin: 0; accent-color: var(--accent); }
+.settings .hint { margin: 6px 0 16px; }
 footer { border-top: 1px solid var(--line); padding-top: 13px; color: var(--muted); font-size: 10px; line-height: 1.7; }
 footer p { margin: 5px 0 10px; }
 .note-dot { display: inline-block; background: var(--accent); box-shadow: 0 0 8px #65cfff66; width: 5px; height: 5px; border-radius: 50%; margin-right: 6px; }

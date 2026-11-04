@@ -5,7 +5,9 @@ detects `Framework64`, then `Framework`, beneath `%SystemRoot%\Microsoft.NET`.
 The helper uses C# 5 and references the framework's `System.Web.Extensions.dll`.
 Compiler 4.8.9221.0 was used for initial compilation.
 
-Run `npm run build` to compile TypeScript and `dist/native/WindowsInput.exe`.
+Run `npm run build:cli` to compile the optional CLI TypeScript and
+`dist/native/WindowsInput.exe`. The Tauri commands build and embed the helper
+automatically.
 `npm run build:native` rebuilds only the helper. Generated files are ignored.
 `node scripts/check-input.mjs` checks invalid requests and adapter lifecycle
 without injecting any keys, after a build.

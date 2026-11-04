@@ -38,6 +38,11 @@
     </section>
     <p id="feedback" class="feedback" role="status" aria-live="polite">Connect to your PC to get started.</p>
     <div id="uncertain" class="uncertain" hidden><p>Outcome unknown—check the emulator before trying again.</p><button id="acknowledge" type="button" class="connect-button">I checked the emulator</button></div>
+    <details class="settings">
+      <summary>Settings</summary>
+      <label class="setting-option" for="confirm-load-enabled"><input id="confirm-load-enabled" type="checkbox" aria-describedby="confirm-load-hint"><span>Confirm before loading a state</span></label>
+      <p class="hint" id="confirm-load-hint">Ask before replacing your current progress. Off by default. Saved in this browser.</p>
+    </details>
     <footer><p><span class="note-dot" aria-hidden="true"></span>Keep your emulator focused on the PC.</p><p>Save overwrites the active slot. Current slot is unknown; check the emulator’s on-screen indicator.</p></footer>
     <noscript><p>Enable JavaScript to use the remote.</p></noscript>
   </main>

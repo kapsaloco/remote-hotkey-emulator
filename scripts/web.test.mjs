@@ -16,7 +16,7 @@ class Element extends EventTarget {
   showModal() { this.open = true; }
   close(value) { this.returnValue = value; this.open = false; this.emit('close'); }
 }
-function harness() {
+function harness(storage = new Map(), storageUnavailable = false) {
   const elements = new Map([...html.matchAll(/id="([^"]+)"/g)].map(match => [match[1], new Element()]));
   const document = new EventTarget();
   document.hidden = false;
@@ -24,7 +24,6 @@ function harness() {
   document.createElement = () => new Element();
   const window = new EventTarget();
   const navigator = { onLine: true };
-  const storage = new Map();
   const requests = [];
   let now = 10000;
   let next = 0;
@@ -44,7 +43,10 @@ function harness() {
     Date: class extends Date { static now() { return now; } },
     setTimeout: (fn, delay) => { timers.set(++next, { fn, due: now + delay }); return next; },
     clearTimeout: id => timers.delete(id), setInterval: () => 0,
-    localStorage: { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) },
+    localStorage: {
+      getItem: key => { if (storageUnavailable) throw new Error('Storage unavailable'); return storage.get(key) ?? null; },
+      setItem: (key, value) => { if (storageUnavailable) throw new Error('Storage unavailable'); storage.set(key, value); },
+    },
   });
   const get = id => elements.get(id);
   async function connect(password = 'A'.repeat(43)) { get('token').value = password; get('connect-form').emit('submit'); await flush(); }
@@ -90,8 +92,44 @@ test('chosen password is exchanged once; wrong password and login limiting keep 
     assert.match(f.get('feedback').textContent, status === 401 ? /Password rejected/ : /Too many sign-in attempts/);
   }
 });
-test('Load cancel sends nothing; confirmation sends once; cooldown blocks rapid taps', async () => {
+test('load sends once without a prompt by default and blocks rapid taps', async () => {
   const h = harness(); await h.connect();
+  assert.equal(h.get('confirm-load-enabled').checked, false);
+  h.get('loadState').emit('click'); h.get('loadState').emit('click'); await flush();
+  assert.equal(h.get('load-dialog').open, false);
+  assert.equal(h.actions().length, 1);
+  assert.equal(JSON.parse(h.actions()[0].body).action, 'loadState');
+});
+
+test('load confirmation preference persists across visits and can be turned off', async () => {
+  const h = harness();
+  h.get('confirm-load-enabled').checked = true; h.get('confirm-load-enabled').emit('change');
+  assert.equal(h.actions().length, 0);
+  const reopened = harness(h.storage); await reopened.connect();
+  assert.equal(reopened.get('confirm-load-enabled').checked, true);
+  reopened.get('loadState').emit('click');
+  assert.equal(reopened.get('load-dialog').open, true);
+  reopened.get('load-dialog').close('cancel');
+  reopened.get('confirm-load-enabled').checked = false; reopened.get('confirm-load-enabled').emit('change');
+  const disabled = harness(h.storage); await disabled.connect();
+  assert.equal(disabled.get('confirm-load-enabled').checked, false);
+  disabled.get('loadState').emit('click'); await flush();
+  assert.equal(disabled.actions().length, 1);
+  assert.equal(disabled.get('load-dialog').open, false);
+});
+
+test('unavailable storage keeps confirmation off by default and allows a session preference', async () => {
+  const h = harness(new Map(), true); await h.connect();
+  assert.equal(h.get('confirm-load-enabled').checked, false);
+  h.get('confirm-load-enabled').checked = true; h.get('confirm-load-enabled').emit('change');
+  h.get('loadState').emit('click');
+  assert.equal(h.get('load-dialog').open, true);
+  assert.equal(h.actions().length, 0);
+});
+
+test('Load cancel sends nothing when enabled; confirmation sends once; cooldown blocks rapid taps', async () => {
+  const h = harness(); await h.connect();
+  h.get('confirm-load-enabled').checked = true; h.get('confirm-load-enabled').emit('change');
   h.get('loadState').emit('click');
   assert.equal(h.get('load-dialog').open, true);
   assert.equal(h.actions().length, 0);
@@ -130,6 +168,7 @@ test('lost response shows unknown outcome and never automatically retries', asyn
 });
 test('offline and background prevent input; returning online only checks health', async () => {
   const h = harness(); await h.connect();
+  h.get('confirm-load-enabled').checked = true;
   h.get('loadState').emit('click');
   h.document.hidden = true; h.document.dispatchEvent(new Event('visibilitychange')); await flush();
   assert.equal(h.get('load-dialog').open, false);

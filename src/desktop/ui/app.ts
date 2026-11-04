@@ -2,7 +2,7 @@ interface DesktopViewState {
   runtime: { phase: string; url?: string; inputAvailable: boolean; error?: string };
   host: string; port: number; passwordEnabled: boolean; addresses: string[];
 }
-type DesktopReply = { ok: true; value?: DesktopViewState } | { ok: false; message: string };
+type DesktopReply = { ok: true; value?: DesktopViewState } | { ok: false; message: string; unavailable?: boolean };
 interface DesktopBridge {
   getState(): Promise<DesktopReply>;
   start(): Promise<DesktopReply>;
@@ -16,18 +16,34 @@ function field<T extends HTMLElement>(id: string): T { return document.getElemen
 let desktopBusy = false;
 let lastState: DesktopViewState | undefined;
 let passwordSaved = false;
+let controllerUnavailable = false;
+let stateVersion = 0;
 const bridge = window.remoteDesktop;
 function message(text: string, error = false): void {
   field('message').textContent = text; field('message').dataset.error = String(error);
 }
+function unavailable(text: string): void {
+  controllerUnavailable = true;
+  lastState = undefined;
+  for (const id of ['start', 'stop', 'copy', 'save-password', 'save-network', 'password', 'toggle-password', 'host', 'port'])
+    field<HTMLInputElement>(id).disabled = true;
+  field('status').textContent = 'Server unavailable';
+  field('status-dot').dataset.phase = 'stopped';
+  field('input-status').textContent = text;
+  field('password-status').textContent = 'Unavailable';
+  field('url').textContent = 'Not running';
+  message(text, true);
+}
 function paint(state: DesktopViewState): void {
+  if (controllerUnavailable) message('Ready.');
+  controllerUnavailable = false;
   lastState = state;
   const running = state.runtime.phase === 'running';
   const changing = desktopBusy || ['starting', 'stopping'].includes(state.runtime.phase);
   field('status').textContent = ({ stopped: 'Server stopped', starting: 'Starting server…', running: 'Server running', stopping: 'Stopping server…', error: 'Server needs attention' } as Record<string, string>)[state.runtime.phase] ?? 'Server stopped';
   field('status-dot').dataset.phase = state.runtime.phase;
   field('input-status').textContent = state.runtime.error ?? (running
-    ? state.runtime.inputAvailable ? 'Ready. Keep PCSX2 focused while using your phone.' : 'Input helper unavailable. Stop and restart the server.'
+    ? state.runtime.inputAvailable ? 'Ready. Keep your configured emulator focused while using your phone.' : 'Input helper unavailable. Stop and restart the server.'
     : 'Start the server to connect your phone.');
   field('url').textContent = state.runtime.url ?? 'Not running';
   field<HTMLButtonElement>('start').disabled = changing || running || !state.passwordEnabled;
@@ -37,6 +53,8 @@ function paint(state: DesktopViewState): void {
   field<HTMLButtonElement>('save-network').disabled = changing;
   field<HTMLInputElement>('password').disabled = changing;
   field<HTMLButtonElement>('toggle-password').disabled = changing;
+  field<HTMLSelectElement>('host').disabled = changing;
+  field<HTMLInputElement>('port').disabled = changing;
   field('password-status').textContent = passwordSaved ? 'Password saved. Use it to connect from your phone.' : state.passwordEnabled ? 'Password is set. Use it to connect from your phone.' : 'Choose a password before starting your server.';
   field('password-status').dataset.saved = String(passwordSaved);
   field('save-password').textContent = state.passwordEnabled ? 'Change password' : 'Set password';
@@ -54,11 +72,12 @@ function paint(state: DesktopViewState): void {
   }
 }
 async function perform(operation: () => Promise<DesktopReply>, success: string): Promise<boolean> {
-  if (desktopBusy) return false;
+  if (desktopBusy || controllerUnavailable) return false;
+  stateVersion++;
   desktopBusy = true; if (lastState) paint(lastState);
   try {
     const result = await operation();
-    if (!result.ok) { message(result.message, true); return false; }
+    if (!result.ok) { if (result.unavailable) unavailable(result.message); else message(result.message, true); return false; }
     if (result.value) paint(result.value);
     message(success);
     return true;
@@ -93,11 +112,12 @@ field('network-form').addEventListener('submit', event => {
 });
 async function refreshState(): Promise<void> {
   if (desktopBusy) return;
+  const version = stateVersion;
   try {
     const result = await bridge.getState();
-    if (desktopBusy) return;
+    if (desktopBusy || version !== stateVersion) return;
     if (result.ok && result.value) { paint(result.value); if (field('message').textContent === 'Loading…') message('Ready.'); }
-    else if (!result.ok) message(result.message, true);
-  } catch { message('Desktop controller unavailable.', true); }
+    else if (!result.ok) { if (result.unavailable) unavailable(result.message); else message(result.message, true); }
+  } catch { unavailable('Desktop controller unavailable.'); }
 }
 void refreshState(); setInterval(() => { void refreshState(); }, 1500);

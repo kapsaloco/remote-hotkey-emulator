@@ -14,6 +14,12 @@ const connection = element<HTMLSpanElement>('connection');
 const feedback = element<HTMLParagraphElement>('feedback');
 const uncertainPanel = element<HTMLDivElement>('uncertain');
 const dialog = element<HTMLDialogElement>('load-dialog');
+const confirmLoad = element<HTMLInputElement>('confirm-load-enabled');
+try { confirmLoad.checked = localStorage.getItem('emulatorRemote.confirmLoad') === 'true'; }
+catch { confirmLoad.checked = false; }
+confirmLoad.addEventListener('change', () => {
+  try { localStorage.setItem('emulatorRemote.confirmLoad', String(confirmLoad.checked)); } catch { /* Optional preference only. */ }
+});
 let token = '';
 let profiles: RemoteProfile[] = [];
 let ready = false;
@@ -166,7 +172,11 @@ async function sendAction(id: ActionId): Promise<void> {
   }
 }
 for (const id of ids) if (id !== 'loadState') element(id).addEventListener('click', () => { void sendAction(id); });
-element('loadState').addEventListener('click', () => { if (usable()) { dialog.returnValue = 'cancel'; dialog.showModal(); } });
+element('loadState').addEventListener('click', () => {
+  if (!usable()) return;
+  if (confirmLoad.checked) { dialog.returnValue = 'cancel'; dialog.showModal(); }
+  else void sendAction('loadState');
+});
 dialog.addEventListener('close', () => { if (dialog.returnValue === 'confirm') void sendAction('loadState'); });
 element('acknowledge').addEventListener('click', () => { uncertain = false; tell('Emulator checked. Checking the connection…'); render(); void checkHealth(); });
 function suspend(): void {

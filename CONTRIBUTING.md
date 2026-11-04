@@ -15,16 +15,20 @@ On Windows, install dependencies with `npm ci`, then run:
 ```powershell
 npm run typecheck
 npm test
-npm run build
+npm run build:cli
 node scripts/check-input.mjs
 ```
 
-These commands do not inject keyboard input. For changes to actual keyboard
+`npm test` includes Rust, desktop UI, phone-client/HTTP integration, and optional
+Node CLI tests. Rust requires the stable MSVC toolchain and C++ Build Tools; see
+the README. These commands do not inject keyboard input. For changes to actual keyboard
 delivery, follow the manual checks in [native/README.md](native/README.md) and
 record the device and emulator versions tested. Do not run real keyboard input
-tests in CI.
+tests in CI. Record remaining manual checks in
+[docs/TAURI-VERIFICATION.md](docs/TAURI-VERIFICATION.md).
 
-Keep local settings in ignored `config/*.local.json` files. Only fictional,
+Keep local settings in ignored data folders (`.tauri-dev-data/`,
+`EmulatorRemote-data/`, or `config/*.local.json` for the optional CLI). Only fictional,
 non-sensitive examples belong in commits. Preserve foreground-process checks,
 authentication, and the rule that actions are never automatically retried.
 

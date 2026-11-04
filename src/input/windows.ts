@@ -3,9 +3,7 @@ import path from 'node:path';
 import { InputRejected } from './adapter';
 
 export function windowsInputHelperPath(): string {
-  return process.versions.electron && !process.defaultApp
-    ? path.join(process.resourcesPath, 'native/WindowsInput.exe')
-    : path.resolve(__dirname, '../native/WindowsInput.exe');
+  return path.resolve(__dirname, '../native/WindowsInput.exe');
 }
 
 export interface Shortcut {
