@@ -148,7 +148,7 @@ async fn reopened_controller_preserves_network_and_profiles_but_not_passwords() 
             .as_array()
             .unwrap()
             .len(),
-        2
+        profiles.profiles.len()
     );
     controller.shutdown().await.unwrap();
     let listener = tokio::net::TcpListener::bind(("127.0.0.1", port))

@@ -26,7 +26,7 @@ a guarantee against every possible form of sensitive data.
 - Rust checks cover profile validation, authentication, sessions, rate limits,
   HTTP bounds/origin checks, deduplication, helper faults, and shutdown.
 - The compiled phone client runs in a DOM simulation against a real Rust HTTP
-  listener with a recording input adapter. It checks sign-in, two profiles,
+  listener with a recording input adapter. It checks sign-in, multiple profiles,
   canceled load confirmation, configured actions, preference storage, and logout.
   This is not a physical phone or emulator test.
 - Controller checks reopen saved network settings and multiple profiles, require
