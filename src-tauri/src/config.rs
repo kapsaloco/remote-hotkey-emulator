@@ -128,7 +128,7 @@ impl Profiles {
                     return Err(INVALID.into());
                 }
             }
-            if ACTIONS[..3]
+            if ACTIONS[..2]
                 .iter()
                 .any(|id| !profile.actions.contains_key(*id))
                 || profile

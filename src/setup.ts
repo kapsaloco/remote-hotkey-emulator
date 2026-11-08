@@ -54,7 +54,7 @@ async function main(): Promise<void> {
   const config = validateServer({ host, port: 3000, token: randomBytes(32).toString('base64url') });
   if (!existsSync(profilesFile)) writeFileSync(profilesFile, JSON.stringify(profiles, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
   writeFileSync(serverFile, JSON.stringify(config, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
-  console.log('Local configuration created. Review PCSX2 process name and shortcuts in config/profiles.local.json.');
+  console.log('Local configuration created. Review emulator process names and shortcuts in config/profiles.local.json.');
   console.log('Run npm run setup -- --set-password to choose an easier sign-in password. Keep local configuration private.');
 }
 main().catch((error: unknown) => {

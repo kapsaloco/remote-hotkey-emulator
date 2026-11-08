@@ -41,7 +41,7 @@ runInNewContext(readFileSync(new URL('../dist/web/app.js', import.meta.url), 'ut
 assert.equal(get('saveState').disabled, true);
 get('token').value = 'test-password'; get('connect-form').emit('submit');
 await waitFor(() => !get('saveState').disabled);
-assert.equal(get('profile').children.length, 2);
+assert.equal(get('profile').children.length, 3);
 assert.equal(get('token').value, ''); assert.equal(storage.size, 0);
 assert.equal(get('confirm-load-enabled').checked, false);
 get('confirm-load-enabled').checked = true; get('confirm-load-enabled').emit('change');

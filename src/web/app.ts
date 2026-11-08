@@ -1,5 +1,5 @@
-const requiredIds = ['saveState', 'loadState', 'nextSlot'] as const;
-const optionalIds = ['previousSlot', 'pauseResume', 'fastForward'] as const;
+const requiredIds = ['saveState', 'loadState'] as const;
+const optionalIds = ['nextSlot', 'previousSlot', 'pauseResume', 'fastForward'] as const;
 const ids = [...requiredIds, ...optionalIds] as const;
 type ActionId = typeof ids[number];
 interface RemoteProfile { id: string; label: string; actions: Partial<Record<ActionId, { label: string; shortcut: string }>> }
@@ -43,6 +43,13 @@ function render(): void {
     element<HTMLButtonElement>(id).disabled = !usable() || !chord;
     element(`${id}-detail`).textContent = chord ? `${profile!.label} · ${chord.shortcut}` : profile ? 'Not configured' : 'Connect to see shortcut';
   }
+  const profile = selected();
+  element('slot-hint').textContent = profile
+    ? profile.actions.nextSlot || profile.actions.previousSlot ? `Check ${profile.label}` : 'Slot cycling unavailable'
+    : 'Check emulator';
+  element('state-hint').textContent = profile?.id === 'rpcs3'
+    ? 'RPCS3: Load restores the most recent save state. Keep the game window focused. Saving may stop the game depending on RPCS3 settings.'
+    : 'Save overwrites the active slot. Current slot is unknown; check the emulator’s on-screen indicator.';
   profileSelect.disabled = busy || checking || connecting || !profiles.length || uncertain;
   uncertainPanel.hidden = !uncertain;
   connectButton.disabled = connecting;

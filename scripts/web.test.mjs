@@ -219,3 +219,24 @@ test('legacy profiles keep working and unconfigured controls stay disabled', asy
   }
   await flush(); assert.equal(h.actions().length, 0);
 });
+
+test('RPCS3 enables save/load and disables unsupported slot arrows', async () => {
+  const h = harness();
+  const profiles = JSON.parse(readFileSync(new URL('../config/profiles.example.json', import.meta.url), 'utf8'));
+  const rpc = profiles.profiles.find(profile => profile.id === 'rpcs3');
+  h.profile.id = rpc.id;
+  h.profile.label = rpc.label;
+  h.profile.actions = Object.fromEntries(Object.entries(rpc.actions).map(([id, chord]) =>
+    [id, { label: id, shortcut: [...chord.modifiers, chord.key].join('+') }]));
+  await h.connect();
+  assert.equal(h.get('saveState').disabled, false);
+  assert.equal(h.get('loadState').disabled, false);
+  assert.equal(h.get('nextSlot').disabled, true);
+  assert.equal(h.get('previousSlot').disabled, true);
+  assert.match(h.get('slot-hint').textContent, /unavailable/);
+  assert.match(h.get('state-hint').textContent, /most recent/);
+  h.get('nextSlot').emit('click'); await flush();
+  assert.equal(h.actions().length, 0);
+  h.get('saveState').emit('click'); await flush();
+  assert.equal(JSON.parse(h.actions()[0].body).profileId, 'rpcs3');
+});

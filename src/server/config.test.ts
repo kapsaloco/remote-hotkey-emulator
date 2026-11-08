@@ -69,3 +69,14 @@ test('bearer auth requires canonical token and rotation invalidates old token', 
     assert.equal(authenticate(header, token), false);
   assert.equal(authenticate(`Bearer ${token}`, randomBytes(32).toString('base64url')), false);
 });
+
+test('RPCS3 maps native shortcuts without requiring slot cycling', () => {
+  const profile = validateProfiles(example()).profiles.find(profile => profile.id === 'rpcs3')!;
+  assert.deepEqual(profile.processNames, ['rpcs3.exe']);
+  assert.equal(displayChord(profile.actions.saveState), 'Ctrl+S');
+  assert.equal(displayChord(profile.actions.loadState), 'Ctrl+Alt+1');
+  assert.equal(displayChord(profile.actions.pauseResume!), 'Ctrl+P');
+  assert.equal(displayChord(profile.actions.fastForward!), 'Ctrl+F10');
+  assert.equal(profile.actions.nextSlot, undefined);
+  assert.equal(profile.actions.previousSlot, undefined);
+});

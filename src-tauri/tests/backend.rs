@@ -38,7 +38,7 @@ fn example() -> Profiles {
 }
 
 #[tokio::test]
-async fn unchanged_phone_client_runs_through_real_rust_http_with_two_profiles() {
+async fn unchanged_phone_client_runs_through_real_rust_http_with_multiple_profiles() {
     use std::sync::{
         atomic::{AtomicBool, Ordering},
         Mutex,
@@ -360,9 +360,9 @@ fn profiles_remain_generic_and_public_view_omits_process_details() {
         .unwrap()
         .validate()
         .unwrap();
-    assert_eq!(profiles.profiles.len(), 2);
+    assert_eq!(profiles.profiles.len(), 3);
     let public = profiles.public_view();
-    assert_eq!(public["profiles"][1]["id"], "duckstation");
+    assert_eq!(public["profiles"][2]["id"], "duckstation");
     assert_eq!(
         public["profiles"][0]["actions"]["previousSlot"]["shortcut"],
         "Shift+F2"

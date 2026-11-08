@@ -41,7 +41,15 @@ Load confirmation is **off by default**. Enable **Settings → Confirm before lo
 
 Stop the server, then edit `EmulatorRemote-data/config/profiles.local.json` (or `.tauri-dev-data/config/profiles.local.json` during development). Use [the example](config/profiles.example.json) as a guide, set `processNames` to the emulator's exact executable filename, and match its shortcuts. Restart the server to apply changes.
 
-Supported keys: `F1`–`F12`, `A`–`Z`, `0`–`9`, `Space`, `Tab`; modifiers: `Ctrl`, `Alt`, `Shift`. Duplicate shortcuts, Windows-key bindings, Alt+F4, and Alt+Tab are rejected. `saveState`, `loadState`, and `nextSlot` are required; other controls are optional.
+Supported keys: `F1`–`F12`, `A`–`Z`, `0`–`9`, `Space`, `Tab`; modifiers: `Ctrl`, `Alt`, `Shift`. Duplicate shortcuts, Windows-key bindings, Alt+F4, and Alt+Tab are rejected. `saveState` and `loadState` are required; other controls are optional.
+
+### RPCS3
+
+The included RPCS3 profile targets `rpcs3.exe`: Save state sends **Ctrl+S**, Load state sends **Ctrl+Alt+1** (most recent state), Pause / Resume sends **Ctrl+P**, and Fast-forward sends **Ctrl+F10** (toggle frame limit). Match these to RPCS3's configured shortcuts and keep its **game window** focused; Ctrl+S in the main RPCS3 window stops the game instead.
+
+RPCS3 loads recent save states rather than cycling PCSX2-style slots, so the slot arrows are disabled. Saving may stop the game depending on RPCS3's save-state settings. Test with your game before relying on it.
+
+New installations include both profiles. For existing installations, stop the server and copy the `rpcs3` profile entry from `config/profiles.example.json` into your local file's `profiles` array, preserving your other profiles and settings. Restart the server, then select RPCS3 on the phone.
 
 ## Network and input safety
 

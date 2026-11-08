@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { networkInterfaces } from 'node:os';
 import { isIPv4 } from 'node:net';
 
-export const requiredActionIds = ['saveState', 'loadState', 'nextSlot'] as const;
-export const optionalActionIds = ['previousSlot', 'pauseResume', 'fastForward'] as const;
+export const requiredActionIds = ['saveState', 'loadState'] as const;
+export const optionalActionIds = ['nextSlot', 'previousSlot', 'pauseResume', 'fastForward'] as const;
 export const actionIds = [...requiredActionIds, ...optionalActionIds] as const;
 export type ActionId = typeof actionIds[number];
 export const actionLabels: Record<ActionId, string> = {
@@ -63,7 +63,7 @@ export function validateProfiles(value: unknown): Profiles {
     const actions = item.actions as Record<string, unknown>;
     if (Object.keys(actions).some(id => !(actionIds as readonly string[]).includes(id)) ||
         requiredActionIds.some(id => !Object.hasOwn(actions, id))) return invalid();
-    const parsed: Profile['actions'] = { saveState: chord(actions.saveState), loadState: chord(actions.loadState), nextSlot: chord(actions.nextSlot) };
+    const parsed: Profile['actions'] = { saveState: chord(actions.saveState), loadState: chord(actions.loadState) };
     for (const id of optionalActionIds) if (Object.hasOwn(actions, id)) parsed[id] = chord(actions[id]);
     const chords = Object.values(parsed).map(displayChord);
     if (new Set(chords).size !== chords.length) return invalid();

@@ -28,7 +28,7 @@
       <button class="action load" id="loadState" type="button" disabled><span class="action-icon" aria-hidden="true">↶</span><span class="action-copy"><span class="action-title">Load state</span><span class="action-detail" id="loadState-detail">Connect to see shortcut</span></span><span class="action-number" aria-hidden="true">02</span></button>
       <div class="slot-controls" role="group" aria-label="Save-state slot">
         <button class="action slot-arrow" id="previousSlot" type="button" aria-label="Previous slot" aria-describedby="previousSlot-detail" disabled><span aria-hidden="true">←</span><span class="sr-only" id="previousSlot-detail">Connect to see shortcut</span></button>
-        <div class="slot-caption"><span>State slot</span><small>Check PCSX2</small></div>
+        <div class="slot-caption"><span>State slot</span><small id="slot-hint">Check emulator</small></div>
         <button class="action slot-arrow" id="nextSlot" type="button" aria-label="Next slot" aria-describedby="nextSlot-detail" disabled><span aria-hidden="true">→</span><span class="sr-only" id="nextSlot-detail">Connect to see shortcut</span></button>
       </div>
       <div class="playback-controls" role="group" aria-label="Playback controls">
@@ -43,7 +43,7 @@
       <label class="setting-option" for="confirm-load-enabled"><input id="confirm-load-enabled" type="checkbox" aria-describedby="confirm-load-hint"><span>Confirm before loading a state</span></label>
       <p class="hint" id="confirm-load-hint">Ask before replacing your current progress. Off by default. Saved in this browser.</p>
     </details>
-    <footer><p><span class="note-dot" aria-hidden="true"></span>Keep your emulator focused on the PC.</p><p>Save overwrites the active slot. Current slot is unknown; check the emulator’s on-screen indicator.</p></footer>
+    <footer><p><span class="note-dot" aria-hidden="true"></span>Keep your emulator focused on the PC.</p><p><span id="state-hint">Check your emulator for save-state status and the current slot.</span></p></footer>
     <noscript><p>Enable JavaScript to use the remote.</p></noscript>
   </main>
   <dialog id="load-dialog" aria-labelledby="load-title" aria-describedby="load-description">
