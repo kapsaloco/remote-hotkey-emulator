@@ -11,6 +11,7 @@ assert.match(origin, /^http:\/\/127\.0\.0\.1:\d+$/);
 const html = readFileSync(new URL('../dist/web/index.html', import.meta.url), 'utf8');
 class Element extends EventTarget {
   value = ''; textContent = ''; disabled = false; hidden = false; dataset = {}; children = []; open = false; returnValue = '';
+  focus() {}
   emit(type) { this.dispatchEvent(new Event(type, { cancelable: true })); }
   replaceChildren() { this.children = []; }
   append(child) { this.children.push(child); }
@@ -40,8 +41,12 @@ runInNewContext(readFileSync(new URL('../dist/web/app.js', import.meta.url), 'ut
 });
 assert.equal(get('saveState').disabled, true);
 get('token').value = 'test-password'; get('connect-form').emit('submit');
+await waitFor(() => !get('profile-area').hidden && get('profile-list').children.length > 0);
+const cards = get('profile-list').children;
+const defaults = JSON.parse(readFileSync(new URL('../config/profiles.example.json', import.meta.url), 'utf8'));
+assert.equal(cards.length, defaults.profiles.length + 1);
+cards[0].emit('click');
 await waitFor(() => !get('saveState').disabled);
-assert.equal(get('profile').children.length, 3);
 assert.equal(get('token').value, ''); assert.equal(storage.size, 0);
 assert.equal(get('confirm-load-enabled').checked, false);
 get('confirm-load-enabled').checked = true; get('confirm-load-enabled').emit('change');
@@ -50,14 +55,15 @@ get('load-dialog').close('cancel'); assert.equal(requests.filter(r => r.route ==
 get('saveState').emit('click');
 await waitFor(() => get('feedback').textContent.startsWith('Shortcut sent.'));
 await delay(350);
-get('profile').value = 'another-emulator'; get('profile').emit('change');
+get('back-to-menu').emit('click');
+assert.equal(get('profile-controls').hidden, true);
+cards.at(-1).emit('click');
 assert.equal(get('pauseResume').disabled, true);
 assert.match(get('saveState-detail').textContent, /F4/);
 get('saveState').emit('click');
 await waitFor(() => requests.filter(r => r.route === '/api/actions').length === 2 && get('feedback').textContent.startsWith('Shortcut sent.'));
-assert.deepEqual([...storage.keys()], ['emulatorRemote.confirmLoad', 'emulatorRemote.profile']);
+assert.deepEqual([...storage.keys()], ['emulatorRemote.confirmLoad']);
 assert.equal(storage.get('emulatorRemote.confirmLoad'), 'true');
-assert.equal(storage.get('emulatorRemote.profile'), 'another-emulator');
 get('disconnect').emit('click');
 await waitFor(() => requests.some(r => r.route === '/api/logout'));
 assert.equal(get('saveState').disabled, true);

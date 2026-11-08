@@ -15,14 +15,20 @@
       <h1 id="title">Stay in<br>the game<span>.</span></h1>
     </section>
     <section class="connection" aria-label="Connection">
-      <div class="connection-heading"><span id="connection" class="connection-state" data-state="offline">Disconnected</span><button id="disconnect" class="text-button" type="button" hidden>Disconnect</button></div>
+      <div class="connection-heading"><span id="connection" class="connection-state" data-state="offline">Disconnected</span><button id="disconnect" class="action disconnect-button" type="button" hidden>Disconnect</button></div>
       <form id="connect-form">
         <label for="token">Password</label>
         <div class="token-row"><input id="token" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="128" placeholder="Enter your remote password"><button id="connect" class="connect-button" type="submit">Connect <span aria-hidden="true">↗</span></button></div>
         <p class="hint">Use the password you chose on your PC. Your existing access token also works until you set a password. Sign-in lasts for this page session, up to 12 hours.</p>
       </form>
-      <div id="profile-area" hidden><label for="profile">Emulator profile</label><select id="profile" disabled></select></div>
+
     </section>
+    <section id="profile-area" class="emulator-menu" aria-labelledby="menu-title" hidden>
+      <h2 id="menu-title" tabindex="-1">Pick a Profile</h2>
+      <div id="profile-list" class="profile-list"></div>
+    </section>
+    <section id="profile-controls" hidden aria-labelledby="profile-title">
+      <div class="profile-heading"><button id="back-to-menu" class="action back-button" type="button"><span class="action-icon" aria-hidden="true">&#8592;</span><span class="action-title">Back</span></button><h2 id="profile-title" tabindex="-1"></h2></div>
     <section class="controls" aria-label="Emulator actions">
       <button class="action save" id="saveState" type="button" disabled><span class="action-icon" aria-hidden="true">↓</span><span class="action-copy"><span class="action-title">Save state</span><span class="action-detail" id="saveState-detail">Connect to see shortcut</span></span><span class="action-number" aria-hidden="true">01</span></button>
       <button class="action load" id="loadState" type="button" disabled><span class="action-icon" aria-hidden="true">↶</span><span class="action-copy"><span class="action-title">Load state</span><span class="action-detail" id="loadState-detail">Connect to see shortcut</span></span><span class="action-number" aria-hidden="true">02</span></button>
@@ -35,6 +41,7 @@
         <button class="action compact" id="pauseResume" type="button" disabled><span class="compact-icon" aria-hidden="true">⏯</span><span>Pause / Resume</span><span class="action-detail" id="pauseResume-detail">Connect to see shortcut</span></button>
         <button class="action compact" id="fastForward" type="button" disabled><span class="compact-icon" aria-hidden="true">⏩</span><span>Fast-forward</span><span class="action-detail" id="fastForward-detail">Connect to see shortcut</span></button>
       </div>
+    </section>
     </section>
     <p id="feedback" class="feedback" role="status" aria-live="polite">Connect to your PC to get started.</p>
     <div id="uncertain" class="uncertain" hidden><p>Outcome unknown—check the emulator before trying again.</p><button id="acknowledge" type="button" class="connect-button">I checked the emulator</button></div>

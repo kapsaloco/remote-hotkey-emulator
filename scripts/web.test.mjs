@@ -10,13 +10,14 @@ const script = readFileSync(new URL('../dist/web/app.js', import.meta.url), 'utf
 const flush = async () => { for (let i = 0; i < 20; i++) await Promise.resolve(); };
 class Element extends EventTarget {
   value = ''; textContent = ''; hidden = false; disabled = false; dataset = {}; children = []; open = false; returnValue = '';
+  focus() {}
   emit(type) { this.dispatchEvent(new Event(type, { cancelable: true })); }
   replaceChildren() { this.children = []; }
   append(item) { this.children.push(item); }
   showModal() { this.open = true; }
   close(value) { this.returnValue = value; this.open = false; this.emit('close'); }
 }
-function harness(storage = new Map(), storageUnavailable = false) {
+function harness(storage = new Map(), storageUnavailable = false, extraProfiles = []) {
   const elements = new Map([...html.matchAll(/id="([^"]+)"/g)].map(match => [match[1], new Element()]));
   const document = new EventTarget();
   document.hidden = false;
@@ -37,7 +38,7 @@ function harness(storage = new Map(), storageUnavailable = false) {
     requests.push({ url, ...options });
     if (url === '/api/login') return { ok: loginStatus === 200, status: loginStatus, json: async () => loginStatus === 200 ? { token: 'B'.repeat(43) } : { code: 'unauthorized' } };
     if (url === '/api/actions') return { ok: status === 200, status, json: () => actionResponse(options) };
-    return { ok: true, status: 200, json: async () => url === '/api/profiles' ? { defaultProfileId: 'pcsx2', profiles: [profile] } : { ready: true, inputAvailable: true } };
+    return { ok: true, status: 200, json: async () => url === '/api/profiles' ? { defaultProfileId: 'pcsx2', profiles: [profile, ...extraProfiles] } : { ready: true, inputAvailable: true } };
   };
   runInNewContext(script, { document, window, navigator, fetch, crypto: webcrypto, AbortController,
     Date: class extends Date { static now() { return now; } },
@@ -49,7 +50,7 @@ function harness(storage = new Map(), storageUnavailable = false) {
     },
   });
   const get = id => elements.get(id);
-  async function connect(password = 'A'.repeat(43)) { get('token').value = password; get('connect-form').emit('submit'); await flush(); }
+  async function connect(password = 'A'.repeat(43), openProfile = true) { get('token').value = password; get('connect-form').emit('submit'); await flush(); if (openProfile && get('profile-list').children.length) get('profile-list').children[0].emit('click'); }
   async function tick(ms) {
     now += ms;
     for (const [id, timer] of [...timers]) if (timer.due <= now) { timers.delete(id); timer.fn(); }
@@ -239,4 +240,83 @@ test('RPCS3 enables save/load and disables unsupported slot arrows', async () =>
   assert.equal(h.actions().length, 0);
   h.get('saveState').emit('click'); await flush();
   assert.equal(JSON.parse(h.actions()[0].body).profileId, 'rpcs3');
+});
+
+ test('emulator menu opens controls and back returns without sending input', async () => {
+  const h = harness(); await h.connect('test-password', false);
+  assert.equal(h.get('profile-area').hidden, false);
+  assert.equal(h.get('profile-controls').hidden, true);
+  assert.equal(h.get('saveState').disabled, true);
+  const card = h.get('profile-list').children[0];
+  assert.equal(card.children[0].src, '/emulator-pcsx2.png');
+  assert.equal(card.children[1].textContent, h.profile.label);
+  card.emit('click');
+  assert.equal(h.get('profile-area').hidden, true);
+  assert.equal(h.get('profile-controls').hidden, false);
+  assert.equal(h.get('profile-title').textContent, h.profile.label);
+  h.get('confirm-load-enabled').checked = true;
+  h.get('loadState').emit('click');
+  h.get('back-to-menu').emit('click');
+  assert.equal(h.get('load-dialog').open, false);
+  assert.equal(h.get('profile-area').hidden, false);
+  assert.equal(h.get('profile-controls').hidden, true);
+  h.get('saveState').emit('click');
+  assert.equal(h.actions().length, 0);
+  card.emit('click'); assert.equal(h.get('saveState').disabled, false);
+  h.get('disconnect').emit('click');
+  assert.equal(h.get('profile-area').hidden, true);
+  assert.equal(h.get('profile-controls').hidden, true);
+ });
+
+test('menu lists every profile and switches between emulator remotes', async () => {
+  const rpc = { id: 'rpcs3', label: 'RPCS3', actions: { saveState: {label: 'Save', shortcut: 'Ctrl+S'}, loadState: {label: 'Load', shortcut: 'Ctrl+Alt+1'} } };
+  const custom = { ...rpc, id: 'custom', label: 'Custom emulator' };
+  const h = harness(new Map(), false, [rpc, custom]); await h.connect('test-password', false);
+  const cards = h.get('profile-list').children;
+  assert.equal(cards.length, 3);
+  assert.equal(cards[1].children[0].src, '/emulator-rpcs3.png');
+  assert.equal(cards[2].children[0].src, '/icon.png');
+  cards[1].emit('click');
+  assert.equal(h.get('profile-title').textContent, 'RPCS3');
+  assert.equal(h.get('nextSlot').disabled, true);
+  h.get('saveState').emit('click'); await flush();
+  assert.equal(JSON.parse(h.actions()[0].body).profileId, 'rpcs3');
+  await h.tick(310); h.get('back-to-menu').emit('click'); cards[0].emit('click');
+  assert.equal(h.get('nextSlot').disabled, false);
+});
+
+test('mGBA menu uses its icon and opens slot 1 controls', async () => {
+ const config = JSON.parse(readFileSync(new URL('../config/profiles.example.json', import.meta.url), 'utf8'));
+ const profile = config.profiles.find(p => p.id === 'mgba');
+ const remote = {id: profile.id, label: profile.label, actions: Object.fromEntries(Object.entries(profile.actions).map(([id, chord]) => [id, {label: id, shortcut: [...chord.modifiers, chord.key].join('+')}]))};
+ const h = harness(new Map(), false, [remote]); await h.connect('test-password', false);
+ const card = h.get('profile-list').children[1];
+ assert.equal(card.children[0].src, '/emulator-mgba.png'); card.emit('click');
+ assert.equal(h.get('profile-title').textContent, 'mGBA');
+ assert.match(h.get('state-hint').textContent, /slot 1/);
+ assert.equal(h.get('nextSlot').disabled, true); assert.equal(h.get('previousSlot').disabled, true);
+ assert.equal(h.get('pauseResume').disabled, false); assert.equal(h.get('fastForward').disabled, false);
+ h.get('saveState').emit('click'); await flush();
+ assert.equal(JSON.parse(h.actions()[0].body).profileId, 'mgba');
+});
+
+for (const id of ['dolphin', 'duckstation', 'ppsspp']) test(id + ' menu icon and remote dispatch match profile', async () => {
+ const config = JSON.parse(readFileSync(new URL('../config/profiles.example.json', import.meta.url), 'utf8'));
+ const profile = config.profiles.find(p => p.id === id);
+ const remote = {id, label: profile.label, actions: Object.fromEntries(Object.entries(profile.actions).map(([key, chord]) => [key, {label: key, shortcut: [...chord.modifiers, chord.key].join('+')}]))};
+ const h = harness(new Map(), false, [remote]); await h.connect('test-password', false);
+ const card = h.get('profile-list').children[1];
+ assert.equal(card.children[0].src, '/emulator-' + id + '.png'); card.emit('click');
+ assert.equal(h.get('profile-title').textContent, profile.label);
+ assert.equal(h.get('fastForward').disabled, true);
+ assert.equal(h.get('previousSlot').disabled, !profile.actions.previousSlot);
+ assert.equal(h.get('nextSlot').disabled, !profile.actions.nextSlot);
+ if (id === 'dolphin') assert.match(h.get('state-hint').textContent, /Dolphin.*slot 1/);
+ for (const action of Object.keys(profile.actions)) {
+  h.get(action).emit('click'); await flush();
+  const request = JSON.parse(h.actions().at(-1).body);
+  assert.equal(request.profileId, id); assert.equal(request.action, action);
+  await h.tick(310);
+ }
+ h.get('back-to-menu').emit('click'); assert.equal(h.get('profile-area').hidden, false);
 });

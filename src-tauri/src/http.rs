@@ -251,6 +251,12 @@ impl HttpState {
                 "text/css; charset=utf-8",
                 include_bytes!("../../dist/web/styles.css"),
             )),
+            "/emulator-pcsx2.png" => Some(("image/png", include_bytes!("../../dist/web/emulator-pcsx2.png"))),
+            "/emulator-dolphin.png" => Some(("image/png", include_bytes!("../../dist/web/emulator-dolphin.png"))),
+            "/emulator-duckstation.png" => Some(("image/png", include_bytes!("../../dist/web/emulator-duckstation.png"))),
+            "/emulator-ppsspp.png" => Some(("image/png", include_bytes!("../../dist/web/emulator-ppsspp.png"))),
+            "/emulator-mgba.png" => Some(("image/png", include_bytes!("../../dist/web/emulator-mgba.png"))),
+            "/emulator-rpcs3.png" => Some(("image/png", include_bytes!("../../dist/web/emulator-rpcs3.png"))),
             "/icon.png" => Some(("image/png", include_bytes!("../../dist/web/icon.png"))),
             _ => None,
         };

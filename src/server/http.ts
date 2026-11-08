@@ -69,6 +69,12 @@ export function createRemoteServer(config: ServerConfig, profiles: Profiles, inp
     ['/', { type: 'text/html; charset=utf-8', file: 'index.html' }],
     ['/styles.css', { type: 'text/css; charset=utf-8', file: 'styles.css' }],
     ['/app.js', { type: 'text/javascript; charset=utf-8', file: 'app.js' }],
+    ['/emulator-pcsx2.png', { type: 'image/png', file: 'emulator-pcsx2.png' }],
+    ['/emulator-dolphin.png', { type: 'image/png', file: 'emulator-dolphin.png' }],
+    ['/emulator-duckstation.png', { type: 'image/png', file: 'emulator-duckstation.png' }],
+    ['/emulator-ppsspp.png', { type: 'image/png', file: 'emulator-ppsspp.png' }],
+    ['/emulator-mgba.png', { type: 'image/png', file: 'emulator-mgba.png' }],
+    ['/emulator-rpcs3.png', { type: 'image/png', file: 'emulator-rpcs3.png' }],
     ['/icon.png', { type: 'image/png', file: 'icon.png' }],
   ].map(([url, asset]) => {
     const item = asset as { type: string; file: string };

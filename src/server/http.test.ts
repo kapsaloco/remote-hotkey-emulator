@@ -162,7 +162,7 @@ test('global authenticated action burst limit prevents excess input', async () =
 test('browser assets are public, typed and allowlisted; configs and source maps stay private', async () => {
   const f = await fixture();
   try {
-    for (const [url, type] of [['/', 'text/html'], ['/app.js', 'text/javascript'], ['/styles.css', 'text/css']] as const) {
+    for (const [url, type] of [['/', 'text/html'], ['/app.js', 'text/javascript'], ['/styles.css', 'text/css'], ['/emulator-pcsx2.png', 'image/png'], ['/emulator-rpcs3.png', 'image/png'], ['/emulator-mgba.png', 'image/png']] as const) {
       const result = await f.send({ method: 'GET', url, headers: { Authorization: '' } });
       assert.equal(result.status, 200);
       assert.ok(result.headers['content-type']?.startsWith(type!));
@@ -258,4 +258,14 @@ test('deduplication cache is bounded and expires, limiter bounds and expires sou
   now += 60001;
   assert.equal(limiter.take('c'), true);
   await dispatcher.close();
+});
+
+test('new emulator icons are served locally without authentication', async () => {
+ const f = await fixture();
+ try {
+  for (const id of ['dolphin', 'duckstation', 'ppsspp']) {
+   const result = await f.send({method: 'GET', url: '/emulator-' + id + '.png', headers: { Authorization: '' }});
+   assert.equal(result.status, 200); assert.ok(result.headers['content-type']?.startsWith('image/png'));
+  }
+ } finally { await f.close(); }
 });

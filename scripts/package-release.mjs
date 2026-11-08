@@ -64,6 +64,8 @@ for (const pkg of [...included].map(id => packages.get(id)).filter(p => p.id !==
     notices.push(`--- ${relative} ---\n${readFileSync(absolute, 'utf8')}\n`);
   }
 }
+notices.push('\nEmulator icons\n', readFileSync(path.join(root, 'assets/emulators/README.md'), 'utf8'));
+for (const file of ['PCSX2-LICENSE.txt', 'RPCS3-LICENSE.txt', 'mGBA-LICENSE.txt', 'Dolphin-LICENSE.txt', 'DuckStation-LICENSE.txt', 'PPSSPP-LICENSE.txt']) notices.push(readFileSync(path.join(root, 'assets/emulators', file), 'utf8'));
 const executable = path.join(output, `${stem}.exe`);
 assert.notEqual(executable, baseline);
 copyFileSync(source, executable);

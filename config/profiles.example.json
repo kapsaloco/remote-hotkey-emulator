@@ -70,6 +70,117 @@
           ]
         }
       }
+    },
+    {
+      "id": "mgba",
+      "label": "mGBA",
+      "processNames": [
+        "mGBA.exe"
+      ],
+      "actions": {
+        "saveState": {
+          "key": "F1",
+          "modifiers": [
+            "Shift"
+          ]
+        },
+        "loadState": {
+          "key": "F1",
+          "modifiers": []
+        },
+        "pauseResume": {
+          "key": "P",
+          "modifiers": [
+            "Ctrl"
+          ]
+        },
+        "fastForward": {
+          "key": "Tab",
+          "modifiers": [
+            "Shift"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dolphin",
+      "label": "Dolphin",
+      "processNames": [
+        "Dolphin.exe"
+      ],
+      "actions": {
+        "saveState": {
+          "key": "F1",
+          "modifiers": [
+            "Shift"
+          ]
+        },
+        "loadState": {
+          "key": "F1",
+          "modifiers": []
+        },
+        "pauseResume": {
+          "key": "F10",
+          "modifiers": []
+        }
+      }
+    },
+    {
+      "id": "duckstation",
+      "label": "DuckStation",
+      "processNames": [
+        "duckstation-qt-x64-ReleaseLTCG.exe",
+        "duckstation-qt-x64-Release.exe",
+        "duckstation-qt.exe"
+      ],
+      "actions": {
+        "saveState": {
+          "key": "F2",
+          "modifiers": []
+        },
+        "loadState": {
+          "key": "F1",
+          "modifiers": []
+        },
+        "previousSlot": {
+          "key": "F3",
+          "modifiers": []
+        },
+        "nextSlot": {
+          "key": "F4",
+          "modifiers": []
+        },
+        "pauseResume": {
+          "key": "Space",
+          "modifiers": []
+        }
+      }
+    },
+    {
+      "id": "ppsspp",
+      "label": "PPSSPP",
+      "processNames": [
+        "PPSSPPWindows64.exe",
+        "PPSSPPWindows.exe"
+      ],
+      "actions": {
+        "saveState": {
+          "key": "F2",
+          "modifiers": []
+        },
+        "loadState": {
+          "key": "F4",
+          "modifiers": []
+        },
+        "nextSlot": {
+          "key": "F3",
+          "modifiers": []
+        },
+        "pauseResume": {
+          "key": "F8",
+          "modifiers": []
+        }
+      }
     }
   ]
 }

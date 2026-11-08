@@ -351,18 +351,19 @@ async fn login(url: &str) -> String {
 fn profiles_remain_generic_and_public_view_omits_process_details() {
     let mut value: Value =
         serde_json::from_str(include_str!("../../config/profiles.example.json")).unwrap();
+    let original_count = value["profiles"].as_array().unwrap().len();
     let mut other = value["profiles"][0].clone();
-    other["id"] = json!("duckstation");
-    other["label"] = json!("DuckStation");
+    other["id"] = json!("custom-emulator");
+    other["label"] = json!("Custom emulator");
     other["processNames"] = json!(["duckstation-qt-x64-ReleaseLTCG.exe"]);
     value["profiles"].as_array_mut().unwrap().push(other);
     let profiles = serde_json::from_value::<Profiles>(value)
         .unwrap()
         .validate()
         .unwrap();
-    assert_eq!(profiles.profiles.len(), 3);
+    assert_eq!(profiles.profiles.len(), original_count + 1);
     let public = profiles.public_view();
-    assert_eq!(public["profiles"][2]["id"], "duckstation");
+    assert_eq!(public["profiles"][original_count]["id"], "custom-emulator");
     assert_eq!(
         public["profiles"][0]["actions"]["previousSlot"]["shortcut"],
         "Shift+F2"

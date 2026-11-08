@@ -80,3 +80,31 @@ test('RPCS3 maps native shortcuts without requiring slot cycling', () => {
   assert.equal(profile.actions.nextSlot, undefined);
   assert.equal(profile.actions.previousSlot, undefined);
 });
+
+test('mGBA uses slot 1 and toggle fast-forward', () => {
+  const profile = validateProfiles(example()).profiles.find(profile => profile.id === 'mgba')!;
+  assert.deepEqual(profile.processNames, ['mGBA.exe']);
+  assert.equal(displayChord(profile.actions.saveState), 'Shift+F1');
+  assert.equal(displayChord(profile.actions.loadState), 'F1');
+  assert.equal(displayChord(profile.actions.pauseResume!), 'Ctrl+P');
+  assert.equal(displayChord(profile.actions.fastForward!), 'Shift+Tab');
+  assert.equal(profile.actions.nextSlot, undefined);
+  assert.equal(profile.actions.previousSlot, undefined);
+});
+
+test('new emulator profiles use distinct native shortcuts and omit held fast-forward', () => {
+ const profiles = validateProfiles(example()).profiles;
+ for (const [id, save, load, pause, previous, next] of [
+ ['dolphin', 'Shift+F1', 'F1', 'F10', undefined, undefined],
+ ['duckstation', 'F2', 'F1', 'Space', 'F3', 'F4'],
+ ['ppsspp', 'F2', 'F4', 'F8', undefined, 'F3'],
+ ]) {
+ const p = profiles.find(p => p.id === id)!;
+ assert.ok(p.processNames.length > 0);
+ assert.equal(displayChord(p.actions.saveState), save); assert.equal(displayChord(p.actions.loadState), load);
+ assert.equal(displayChord(p.actions.pauseResume!), pause);
+ assert.equal(p.actions.previousSlot && displayChord(p.actions.previousSlot), previous);
+ assert.equal(p.actions.nextSlot && displayChord(p.actions.nextSlot), next);
+ assert.equal(p.actions.fastForward, undefined);
+ }
+});

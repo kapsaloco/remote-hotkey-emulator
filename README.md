@@ -49,7 +49,23 @@ The included RPCS3 profile targets `rpcs3.exe`: Save state sends **Ctrl+S**, Loa
 
 RPCS3 loads recent save states rather than cycling PCSX2-style slots, so the slot arrows are disabled. Saving may stop the game depending on RPCS3's save-state settings. Test with your game before relying on it.
 
-New installations include both profiles. For existing installations, stop the server and copy the `rpcs3` profile entry from `config/profiles.example.json` into your local file's `profiles` array, preserving your other profiles and settings. Restart the server, then select RPCS3 on the phone.
+New installations automatically save all six included profiles: PCSX2, RPCS3, mGBA, Dolphin, DuckStation, and PPSSPP. Profiles persist across restarts. Existing installations preserve their local file; to add missing profiles, stop the server and copy the corresponding entries from `config/profiles.example.json` into your local file's `profiles` array, preserving your other profiles and settings. Restart the server, then pick an emulator from the phone menu.
+
+### mGBA
+
+The included mGBA profile targets `mGBA.exe`: Save state sends **Shift+F1** and Load state sends **F1**, both using **slot 1**. Pause / Resume sends **Ctrl+P**; Fast-forward sends **Shift+Tab** (toggle). Slot arrows are disabled. Match these to your mGBA shortcut settings and keep its game window focused.
+
+### Dolphin, DuckStation, and PPSSPP
+
+| Profile | Save | Load | Previous / Next slot | Pause |
+| --- | --- | --- | --- | --- |
+| Dolphin | Shift+F1 (slot 1) | F1 (slot 1) | Unavailable | F10 |
+| DuckStation | F2 | F1 | F3 / F4 | Space |
+| PPSSPP (Windows) | F2 | F4 | Unavailable / F3 | F8 |
+
+Keep the game's emulator window focused and match these shortcuts to your emulator settings. Dolphin always uses slot 1. DuckStation and PPSSPP use their selected slot; check it in the emulator. Fast-forward is disabled for these profiles because their default Tab binding is held rather than toggled. PPSSPP's speed toggle uses a key outside this remote's supported set.
+
+Official shortcut sources: [Dolphin](https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/HotkeyManager.cpp), [DuckStation](https://github.com/stenzek/duckstation/blob/master/src/core/hotkeys.cpp), [PPSSPP Windows](https://github.com/hrydgard/ppsspp/blob/master/Windows/ppsspp.rc), and [PPSSPP controls](https://github.com/hrydgard/ppsspp/blob/master/Core/KeyMapDefaults.cpp).
 
 ## Network and input safety
 

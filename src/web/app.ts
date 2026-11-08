@@ -8,7 +8,11 @@ const form = element<HTMLFormElement>('connect-form');
 const tokenField = element<HTMLInputElement>('token');
 const connectButton = element<HTMLButtonElement>('connect');
 const disconnectButton = element<HTMLButtonElement>('disconnect');
-const profileSelect = element<HTMLSelectElement>('profile');
+const profileList = element<HTMLDivElement>('profile-list');
+const profileControls = element<HTMLElement>('profile-controls');
+const backButton = element<HTMLButtonElement>('back-to-menu');
+let selectedProfileId = '';
+const profileButtons: HTMLButtonElement[] = [];
 const profileArea = element<HTMLDivElement>('profile-area');
 const connection = element<HTMLSpanElement>('connection');
 const feedback = element<HTMLParagraphElement>('feedback');
@@ -34,7 +38,7 @@ const controllers = new Set<AbortController>();
 class ApiError extends Error { constructor(readonly status: number, readonly code: string) { super('API request failed'); } }
 function tell(message: string): void { feedback.textContent = message; }
 function connected(label: string, state: string): void { connection.textContent = label; connection.dataset.state = state; }
-function selected(): RemoteProfile | undefined { return profiles.find(profile => profile.id === profileSelect.value); }
+function selected(): RemoteProfile | undefined { return profiles.find(profile => profile.id === selectedProfileId); }
 function usable(): boolean { return ready && !!token && !!selected() && navigator.onLine && !document.hidden && !busy && !connecting && !uncertain && Date.now() >= cooldownUntil; }
 function render(): void {
   for (const id of ids) {
@@ -49,8 +53,14 @@ function render(): void {
     : 'Check emulator';
   element('state-hint').textContent = profile?.id === 'rpcs3'
     ? 'RPCS3: Load restores the most recent save state. Keep the game window focused. Saving may stop the game depending on RPCS3 settings.'
-    : 'Save overwrites the active slot. Current slot is unknown; check the emulator’s on-screen indicator.';
-  profileSelect.disabled = busy || checking || connecting || !profiles.length || uncertain;
+    : (profile?.id === 'mgba' || profile?.id === 'dolphin')
+      ? `${profile.label}: Save and load use slot 1. Saving overwrites slot 1; loading replaces your current progress.`
+      : 'Save overwrites the active slot. Current slot is unknown; check the emulator’s on-screen indicator.';
+  profileArea.hidden = !token || !!profile;
+  profileControls.hidden = !token || !profile;
+  element('profile-title').textContent = profile?.label ?? '';
+  backButton.disabled = busy || connecting;
+  for (const button of profileButtons) button.disabled = busy || connecting || uncertain;
   uncertainPanel.hidden = !uncertain;
   connectButton.disabled = connecting;
 }
@@ -71,6 +81,7 @@ async function api(route: string, payload?: unknown): Promise<any> {
 function abortRequests(): void { for (const controller of controllers) controller.abort(); }
 function expireToken(): void {
   ready = false; token = ''; tokenField.value = ''; form.hidden = false; disconnectButton.hidden = true;
+  selectedProfileId = ''; profiles = [];
   connected('Authentication needed', 'error');
 }
 function validProfiles(value: any): value is { defaultProfileId: string; profiles: RemoteProfile[] } {
@@ -117,16 +128,24 @@ async function connect(candidate: string): Promise<void> {
     if (version !== generation) return;
     if (!validProfiles(result)) throw new Error('Invalid profiles');
     profiles = result.profiles;
-    profileSelect.replaceChildren();
+    selectedProfileId = '';
+    profileList.replaceChildren(); profileButtons.length = 0;
     for (const profile of profiles) {
-      const option = document.createElement('option'); option.value = profile.id; option.textContent = profile.label; profileSelect.append(option);
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'profile-card';
+      const icon = document.createElement('img'); icon.alt = ''; icon.width = 72; icon.height = 72;
+      if (['pcsx2', 'rpcs3', 'mgba', 'dolphin', 'duckstation', 'ppsspp'].includes(profile.id)) icon.src = '/emulator-' + profile.id + '.png';
+      else icon.src = '/icon.png';
+      const label = document.createElement('span'); label.className = 'profile-card-label'; label.textContent = profile.label;
+      button.append(icon); button.append(label);
+      button.addEventListener('click', () => {
+        if (busy || connecting || uncertain || !token) return;
+        selectedProfileId = profile.id; render();
+        tell('Keep ' + profile.label + ' focused on your PC.'); element('profile-title').focus();
+      });
+      profileButtons.push(button); profileList.append(button);
     }
-    let stored: string | null = null;
-    try { stored = localStorage.getItem('emulatorRemote.profile'); } catch { /* Storage may be unavailable. */ }
-    profileSelect.value = profiles.some(profile => profile.id === stored) ? stored! : result.defaultProfileId;
-    if (!selected()) profileSelect.value = profiles[0]!.id;
-    profileArea.hidden = false; form.hidden = true; disconnectButton.hidden = false;
-    tell('Ready to connect. Keep the emulator focused on your PC.');
+    form.hidden = true; disconnectButton.hidden = false;
+    tell('Choose an emulator to open its controls.');
   } catch (error) {
     if (version !== generation) return;
     expireToken();
@@ -137,10 +156,13 @@ async function connect(candidate: string): Promise<void> {
     if (version === generation && token) await checkHealth();
   }
 }
-profileSelect.addEventListener('change', () => {
-  try { localStorage.setItem('emulatorRemote.profile', profileSelect.value); } catch { /* Optional preference only. */ }
-  render();
+backButton.addEventListener('click', () => {
+  if (busy || connecting) return;
+  if (dialog.open) dialog.close('cancel');
+  selectedProfileId = ''; render(); tell('Choose an emulator to open its controls.');
+  element('menu-title').focus();
 });
+
 disconnectButton.addEventListener('click', () => {
   generation++; abortRequests();
   if (token) void api('/api/logout', {}).catch(() => {});
